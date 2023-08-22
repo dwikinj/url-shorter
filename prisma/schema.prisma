@@ -1,0 +1,39 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url = env("DATABASE_URL")
+}
+
+model User {
+    id Int @id  @default(autoincrement())
+    name String
+    email String @unique
+    password String
+    birthday DateTime
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+    token Token[] @relation("Token")
+    shortUrl Shorturl[] @relation("ShortUrl")
+    
+}
+
+model Token {
+    id Int @id @default(autoincrement())
+    userId Int
+    user User @relation("Token", fields: [userId], references: [id], onDelete: Cascade)
+    token String? @db.Text
+    expiry DateTime?
+
+}
+
+model Shorturl {
+    id Int @id @default(autoincrement())
+    originalUrl String
+    paramsUrl String @unique //menyimpan params url defaultnya dari nanoid(7)
+    views Int @default(0)
+    userId Int 
+    user User @relation("ShortUrl", fields: [userId], references: [id], onDelete: Cascade)
+}
